@@ -1,0 +1,86 @@
+Example lines to show assembled structure of a line in the .NC file.
+N0001/0M000X+00000Y+00000Z0000W000U00MH+000;
+N0002/0M000X+00000Y+00000Z0000W000U00MH+000;
+N0003/0M000X+00000Y+00000Z0000W000U00MH+000;
+// Program continues as follows with alternate feeder data. Default for each value is 000 (no alternate selected).
+S01Z000G000,000,000,000 // Five positions for five digit number
+.
+.
+.
+S40Z000G000,000,000,000 // Each position left -> right then up -> down 
+*			// sequentially increases the feeder index from 1 -> 200
+			// and the correcponding value 000 -> 999
+			// is the alternate set number
+			// see page 5-43 of operation manual
+[Note 5 * 40 = 200 feeder slots, hence 40 lines with 5 3 digit nums]
+
+Breakdown of each line as idividual items veritcally
+[range of vals]
+(units of vals)
+"Comment"
+
+N
+lineNum [0001 -> 2000]
+/
+skip [0 -> 9]
+M 
+mCode [000 -> 999]
+X
+xDist [-99999 -> +99999] (mm/100)
+Y
+yDist [-99999 -> +99999] (mm/100)
+Z
+unknown value [0 only?] "Unknown function. Maybe for extra feeders on other machine models?"
+-Yes anything other than 0 is interpreted weirdly. i.e. multiplited by five and used as the head number
+-e.x. 5 is a head number of 25 and 9 is a head number of 45. The screen can't even display these values properly.
+feederNum/headNum [001 -> 200] "Feeders 1->200 on Head 1"
+		  [201 -> 400] "Feeders 1->200 on Head 2"
+                  [401 -> 600] "Feeders 1->200 on Head 3"
+// Feeders 141 -> 150 for each head not available for selection on this machine
+W
+angle [000 -> 359]
+U
+unused axis? [00 -> 99]????? "Was always U00 in every file example file I looked at."
+	-Axis used on other machine models? Conveyor width adjustment axis?
+	-Best current guess is this is unused by the machine and it can't interpret it.
+		-Checked with some values, but was unable to fully confirm this is the case.
+		-Still until future refference and it is needed I'm ignoring this.
+MH
+mountHeight [-999 -> 999]
+;
+comment [10 alphaNumeric char]
+
+U code (Done)
+Z char (Done)
+Feeder duplicate (Done)
+M Codes (Done enough, there are likely many others, aswell as combinations of multiple functions
+		but, not important enough to worry about for now.)
+
+	
+
+M000 -> All special commands 0
+Special commands if single var and all other field = 0
+M006 -> Bad Mark = 1
+M007 -> Bad Mark = 2
+M801 -> Alignment Mark = 1
+M802 -> Alignment Mark = 2
+M000 -> Repeat = 0
+M901 -> Repeat = 1
+M902 -> Repeat = 2
+M911 -> Repeat = 3
+M912 -> Repeat = 4
+M921 -> Repeat = 5
+M922 -> Repeat = 6
+M931 -> Repeat = 7
+M932 -> Repeat = 8
+Dispense options 1 and 2 require mount to be set to 0
+M000 -> Mount/Dispense both 0
+M002 -> Mount = 1, Dispense = 0
+M004 -> Mount = 0, Dispense = 1
+M005 -> Mount = 0, Dispense = 2
+
+
+Other company only used
+M000
+M002
+M801
