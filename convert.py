@@ -1,7 +1,5 @@
 #TODO:
 # Fix parameter intake with help and other info
-# Fix broken origin conversion, logic different
-#    depending upon in which quadrant the new origin is in
 
 import os
 import argparse
