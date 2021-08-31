@@ -61,7 +61,8 @@ for y in range(len(yDist)):
 # Dummy Parameters to assemble
 skip = '0'
 mCode = '000'
-feederNum = '050'
+headNum = '1'
+feederNum = '017'
 unused = '00'
 mountHeightPlusMinus = '+'
 mountHeight = '000'
@@ -74,7 +75,7 @@ for i in range(len(partNames)):
   yPlusMinus = '+' if yDist[i] >= 0 else '-'
 
   # Build lines using .NC format
-  line = 'N' + str(i).zfill(4) + '/' + skip + 'M' + mCode + \
+  line = 'N' + str(i + 1).zfill(4) + '/' + skip + 'M' + mCode + \
     'X' + xPlusMinus + str(xDist[i]).replace('+', '').replace('-', '').zfill(5) + \
     'Y' + yPlusMinus + str(yDist[i]).replace('+', '').replace('-', '').zfill(5) + \
     'Z0' + feederNum + 'W' + str(rot[i]).zfill(3) + 'U' + unused + 'MH' + \
@@ -85,4 +86,4 @@ for i in range(len(partNames)):
 
 # Write .NC file
 with open(fileOut, 'w') as file:
-  file.write('\n'.join(newLines))
+  file.write('\r\n'.join(newLines))
