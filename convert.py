@@ -1,6 +1,5 @@
 #TODO:
 # Fix parameter intake with help and other info
-# x and y -> (5 digits) mm/100
 
 import os
 import argparse
@@ -9,15 +8,13 @@ import numpy as np
 # Parse user args
 parser = argparse.ArgumentParser()
 parser.add_argument('fileIn')
+parser.add_argument('configFile')
 parser.add_argument('fileOut')
-parser.add_argument('boardSize_X')
-parser.add_argument('boardSize_Y')
 args = parser.parse_args()
 
 fileIn = args.fileIn
+configFile = args.configFile
 fileOut = args.fileOut
-boardSize_X = float(args.boardSize_X)
-boardSize_Y = float(args.boardSize_Y)
 
 # Remove special chars that may confuse Numpy
 #   and save to a temp file so that the original doesn't have to be modified
@@ -31,7 +28,7 @@ for i in special_char:
 with open('temp.csv', 'w') as file:
   file.write(filedata)
 
-# Numpy read in csv
+# Numpy read in KiCad Position .csv
 dataIn = np.genfromtxt('temp.csv', delimiter=',', dtype='U70', skip_header=True)
 
 # Delete temp file
@@ -46,26 +43,38 @@ xDist = [float(i) for i in dataIn[:,3]]
 yDist = [float(i) for i in dataIn[:,4]]
 rot = [int(float(i)) for i in dataIn[:,5]]
 
+# Numpy read in Board Configuration .csv
+configData = np.genfromtxt(configFile, delimiter=',', dtype='int_', skip_header=True)
+
+# Extract useful values
+stepNumber = configData[:,0]
+skip = configData[:,1]
+mCode = configData[:,2]
+feederNum = configData[:,3]
+unused = '00'
+headNum = configData[:,4]
+mountHeight = configData[:,5]
+
+originOffsetX = float(configData[0,7])
+originOffsetY = float(configData[0,8])
+
 # Convert positioning for board size
 
 # This math translates the origin point from
-#   the upper left (KiCad Refference) to 
-#   the lower right (Pick and Place Machine Static Refference)
-
+#   the KiCad Origin to 
+#   Pick and Place Machine Static Refference
 # * 100 so that units are mm/100 instead of mm
-for x in range(len(xDist)):
-  xDist[x] = int((-(boardSize_X - xDist[x])) * 100) 
-for y in range(len(yDist)):
-  yDist[y] = int((boardSize_Y + yDist[y]) * 100)
 
-# Dummy Parameters to assemble
-skip = '0'
-mCode = '000'
-headNum = '1'
-feederNum = '017'
-unused = '00'
-mountHeightPlusMinus = '+'
-mountHeight = '000'
+for x in range(len(xDist)):
+  xDist[x] = int((xDist[x] + originOffsetX) * 100) 
+for y in range(len(yDist)):
+  yDist[y] = int((yDist[y] + originOffsetY) * 100)
+
+# Check to make sure the KiCad Pos file and the 
+#   Config file have the same number of steps
+if len(partNames) != len(stepNumber):
+  print('Given parameter files do not have the same number of steps.')
+  quit(0)
 
 # Assemble with .NC format
 newLines = []
@@ -73,13 +82,24 @@ for i in range(len(partNames)):
   # Assembly logic
   xPlusMinus = '+' if xDist[i] >= 0 else '-'
   yPlusMinus = '+' if yDist[i] >= 0 else '-'
+  mountHeightPlusMinus = '+' if mountHeight[i] >= 0 else '-'
+  
+  if headNum[i] == 1:
+    feeder = feederNum[i]
+  elif headNum[i] == 2:
+    feeder = feederNum[i] + 200
+  elif headNum[i] == 3:
+    feeder = feederNum + 400
+  else:
+    print('Error: Head Specified not 1,2, or 3')
+    quit(0)
 
   # Build lines using .NC format
-  line = 'N' + str(i + 1).zfill(4) + '/' + skip + 'M' + mCode + \
+  line = 'N' + str(i + 1).zfill(4) + '/' + str(skip[i]) + 'M' + str(mCode[i]).zfill(3) + \
     'X' + xPlusMinus + str(xDist[i]).replace('+', '').replace('-', '').zfill(5) + \
     'Y' + yPlusMinus + str(yDist[i]).replace('+', '').replace('-', '').zfill(5) + \
-    'Z0' + feederNum + 'W' + str(rot[i]).zfill(3) + 'U' + unused + 'MH' + \
-    mountHeightPlusMinus + mountHeight + ';' + partNames[i]
+    'Z0' + str(feeder).zfill(3) + 'W' + str(rot[i]).zfill(3) + 'U' + unused + 'MH' + \
+    mountHeightPlusMinus + str(mountHeight[i]).zfill(3) + ';' + partNames[i]
 
   # Add to list
   newLines.append(line)

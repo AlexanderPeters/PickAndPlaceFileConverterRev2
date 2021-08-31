@@ -50,9 +50,7 @@ mountHeight [-999 -> 999]
 ;
 comment [10 alphaNumeric char]
 
-U code (Done)
-Z char (Done)
-Feeder duplicate (Done)
+
 M Codes (Done enough, there are likely many others, aswell as combinations of multiple functions
 		but, not important enough to worry about for now.)
 
