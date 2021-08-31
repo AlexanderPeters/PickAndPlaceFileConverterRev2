@@ -1,5 +1,7 @@
 #TODO:
 # Fix parameter intake with help and other info
+# Fix broken origin conversion, logic different
+#    depending upon in which quadrant the new origin is in
 
 import os
 import argparse
@@ -66,9 +68,9 @@ originOffsetY = float(configData[0,8])
 # * 100 so that units are mm/100 instead of mm
 
 for x in range(len(xDist)):
-  xDist[x] = int((xDist[x] + originOffsetX) * 100) 
+  xDist[x] = int((xDist[x] - originOffsetX) * 100) 
 for y in range(len(yDist)):
-  yDist[y] = int((yDist[y] + originOffsetY) * 100)
+  yDist[y] = int((yDist[y] - originOffsetY) * 100)
 
 # Check to make sure the KiCad Pos file and the 
 #   Config file have the same number of steps
