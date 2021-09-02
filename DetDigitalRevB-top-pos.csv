@@ -1,5 +1,4 @@
 Ref,Val,Package,PosX,PosY,Rot,Side
-"BT1","Battery","BATHLD001",22.860000,-66.040000,0.000000,top
 "C1",".1uf","C_0805_2012Metric_Pad1.15x1.40mm_HandSolder",17.449800,-30.298500,270.000000,top
 "C2","C_Small","C_0805_2012Metric_Pad1.15x1.40mm_HandSolder",30.734000,-22.352000,0.000000,top
 "C3",".1uf","C_0805_2012Metric_Pad1.15x1.40mm_HandSolder",32.004000,-44.196000,0.000000,top
